@@ -48,14 +48,15 @@ class Module(object):
     """
     id = ''
     __ioc__ = None
+    result = None
 
-    def __inmodule(self,ioc=None):
+    def __init__(self,ioc=None):
         self.__ioc__ = ioc
 
-    def new_module(self, name):
+    def new(self, name):
         return self.__ioc__.new(name)
 
-    def get_module(self, name):
+    def get(self, name):
         return self.__ioc__.get(name)
 
     def run(self,context):
@@ -66,7 +67,8 @@ class Module(object):
         pass
 
     def start(self,context):
-        self.run(context=context)
+        self.result = self.run(context=context)
+        return self.result
 
     def help(self):
         try:
@@ -93,7 +95,6 @@ class AsyncModule(Module):
     Intra/inter synchronization must be handled by each module. Modules are seperate processes.
     """
     status = None
-    result = None
     exception = None
     __logger__ = None
 
@@ -104,13 +105,13 @@ class AsyncModule(Module):
         super(AsyncModule,self).__init__(ioc=ioc)
         self.status = NOT_STARTED
 
-    def start(self):
+    def start(self, context):
         """
         The main method to start a module. In Async, it will return immediately with the result from apply_async.
         """
         pool = NonDaemonizedPool(processes=1)
         self.status = RUNNING
-        result = pool.apply_async(self.__setup__,[kwargs],callback=self.__finish_internal__)
+        result = pool.apply_async(self.__setup__,[context],callback=self.__finish_internal__)
         return result
 
     def __setup__(self,context):
@@ -122,13 +123,14 @@ class AsyncModule(Module):
             return self.run(context)
         except Exception as e:
             try:
-                exc = AsyncException(e.message)
+                exc = AsyncException(str(e))
                 exc_info = sys.exc_info()
                 exc.exc_class = exc_info[0]
-                exc.traceback += "".join(traceback.format_exception(*ex_info))
+                exc.traceback = "".join(traceback.format_exception(*exc_info))
                 return exc
             except Exception as e:
-                print ("FATAL ERROR -- " + str(e))
+                self.log("FATAL ERROR -- " + str(e))
+                traceback.print_exc()
 
     def __finish_internal__(self,callback_args):
         """

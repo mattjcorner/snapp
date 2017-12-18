@@ -1,3 +1,3 @@
 # Snapp
 
-I already hate this name too.
+An easy way to create asyncronous apps with dependency injection via a simple IoC container

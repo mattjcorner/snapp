@@ -1,5 +1,5 @@
 #!/bin/bash
 
-ROOT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )"
+ROOT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../src && pwd )"
 
-pip install ${ROOT_PATH} --upgrade --force --ignore-installed
+pip install -e ${ROOT_PATH}

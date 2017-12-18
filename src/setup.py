@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from distutils.core import setup
 
 setup(name='snapp',
-      version='0.1.0a1',
+      version='0.1.2',
       description='Python framework for building command line applications.',
       author='Matthew Corner',
       author_email='matt.corner@gmail.com',

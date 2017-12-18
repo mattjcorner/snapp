@@ -1,3 +1,5 @@
+import multiprocessing
+
 """
 ioc.py
 
@@ -18,11 +20,17 @@ class SingleObjectContainer(object):
     __objects = None
     object_type = None
 
-    def __init__(self, obj_type = None):
+    def __init__(self, manager, obj_type = None):
         if self.object_type is not None and not isinstance(Type, obj_type):
             raise TypeError("Expected type Type got " + str(type(obj_type)) + ".")
         self.object_type = obj_type
-        self.__objects = dict()
+
+        # TODO
+        #### Check is not working for some reason?
+        #if not isinstance(manager, multiprocessing.Manager):
+        #    raise TypeError("Expected type Manager got " + str(type(manager)) +
+        #            ".")
+        self.__objects = manager.dict()
 
     def register(self, id, obj):
         if obj is None:
@@ -31,7 +39,7 @@ class SingleObjectContainer(object):
         if id is None:
             raise TypeError("You cannot use a None type as an id.")
 
-        if not isinstance(id,basestring):
+        if not isinstance(id,str):
             raise TypeError("You must pass a valid string for the id.")
         
         if self.object_type is None:
